@@ -13,6 +13,7 @@ package eventbus;
 import java.util.ArrayList;
 import java.util.List;
 
+import events.EventThatShouldBeSynchronized;
 import events.IEvent;
 
 public class EventBusThread extends Thread implements IEventBusThread {
@@ -32,9 +33,40 @@ public class EventBusThread extends Thread implements IEventBusThread {
 				synchronized(eventsToSend) {
 					if (eventsToSend.size() > 0) {
 						System.out.println("Envoie de l'événement " + eventsToSend.get(0).toString());
-						for(IEventBusCommunicator ievc : lstComm)
-							ievc.sendToListener(eventsToSend.get(0));
+						
+						
+						if(eventsToSend.get(0).getClass().getName().equals("events.EventThatShouldBeSynchronized")){
+							//Synchrone
+							
+							int last =0;
+							int currentID=0;
+							IEventBusCommunicator currentIEBus = null; 
+							
+							for (int i = 0; i < lstComm.size(); i++) {
+								int min = Integer.MAX_VALUE;
+								for(IEventBusCommunicator ievc : lstComm){
+									currentID = ievc.getID();
+									if( ( currentID < min ) && ( currentID > last) ){
+										min = currentID;
+										currentIEBus = ievc;
+									}
+								}
+								last = currentIEBus.getID();
+								currentIEBus.sendToListener(eventsToSend.get(0));
+							}
+							
+							
 						eventsToSend.remove(0);
+							
+							
+						}else{
+							//Asynchrone
+						
+							for(IEventBusCommunicator ievc : lstComm)
+								ievc.sendToListener(eventsToSend.get(0));
+								
+							eventsToSend.remove(0);
+						}
 					}
 				}
 			}

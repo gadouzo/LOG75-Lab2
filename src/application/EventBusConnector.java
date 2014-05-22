@@ -18,6 +18,7 @@ package application;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,11 +39,17 @@ public class EventBusConnector extends Thread implements IEventBusConnector {
 	private ReadEventFromStream readStream;
 	
 	@SuppressWarnings("unchecked")
-	public EventBusConnector(List<Class> listenedEvents, String ip, int port) {
+	public EventBusConnector(List<Class> listenedEvents, String ip, int port, int id) {
 		this.listenedEvents = listenedEvents;
 
 		try {
 			s = new Socket(ip, port);
+			
+			PrintWriter outPrinter = new PrintWriter(s.getOutputStream());
+			outPrinter.println(id);
+			outPrinter.flush();
+			//.close();
+			
 			oos = new ObjectOutputStream(s.getOutputStream());
 			ois = new ObjectInputStream(s.getInputStream());
 			readStream = new ReadEventFromStream(ois, this);

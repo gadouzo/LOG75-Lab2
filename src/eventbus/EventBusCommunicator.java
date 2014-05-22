@@ -31,6 +31,7 @@ public class EventBusCommunicator extends Thread implements IEventBusCommunicato
 	private ObjectOutputStream oos;
 	private ObjectInputStream ois;
 	private ReadEventFromStream readStream;
+	private int id;
 	
 	//Thread qui écoute les événements provenant des applications.
 	//Le Communicator achemine les événements sur le bus d'événements.
@@ -58,8 +59,10 @@ public class EventBusCommunicator extends Thread implements IEventBusCommunicato
 	}
 
 	
-	public EventBusCommunicator(Socket s, IEventBusThread iebt)
+	public EventBusCommunicator(Socket s, IEventBusThread iebt, int id)
 	{
+		this.id = id;
+		
 		// Création du thread de lecture des évènements dans le Bus.
 		try {
 			oos = new ObjectOutputStream(s.getOutputStream());
@@ -98,5 +101,10 @@ public class EventBusCommunicator extends Thread implements IEventBusCommunicato
 	
 	public void sendToListener(IEvent ie) {
 		lstEventsToSend.add(ie);
+	}
+
+	@Override
+	public int getID() {
+		return id;
 	}
 }

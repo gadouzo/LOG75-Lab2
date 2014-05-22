@@ -13,4 +13,5 @@ import events.IEvent;
 
 public interface IEventBusCommunicator {
 	public void sendToListener(IEvent ie);
+	public int getID();
 }

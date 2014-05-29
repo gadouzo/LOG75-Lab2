@@ -23,6 +23,8 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+import events.EventSyncResponse;
+import events.EventThatShouldBeSynchronized;
 import events.IEvent;
 
 
@@ -116,6 +118,10 @@ public class EventBusConnector extends Thread implements IEventBusConnector {
 	{
 		for(IObserver o : lstObserver) {
 			o.update(this, event);
+			
+			if (event instanceof EventThatShouldBeSynchronized){
+				lstEventsToSend.add(new EventSyncResponse("OK"));
+			}
 		}
 	}
 	
